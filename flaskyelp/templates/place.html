@@ -23,7 +23,7 @@
   </ul>
 
   <h2>Add Review</h2>
-  <form action="{{ url_for('newcomment', id=place.place_id)}}" method="post">
+  <form action="{{ url_for('newcomment', id=pid)}}" method="post">
     <dl>
       <dt>Title:
       <dd><input type="text" name="title" size="30" value="{{ request.form.title }}">

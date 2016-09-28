@@ -63,6 +63,7 @@ def init_db():
 
 @app.before_request
 def before_request():
+    """ Before the request, we check is the user is logged """
     g.is_logged = False
     if 'user_id' in session:
         g.user_id = session['user_id']
@@ -81,7 +82,7 @@ def close_db(error):
 
 @app.cli.command('initdb')
 def initdb_command():
-    """Initializes the database from the CLI"""
+    """Initializes the database from the command line"""
     init_db()
 
 @app.route('/')
@@ -97,34 +98,29 @@ def index():
 @app.route('/place/<id>')
 def show_place(id):
     """Show the restaurant which has the id as parameter """
-    theplace = query_db('''select *, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', id)[0]
+    theplace = query_db('''select places.name, places.address, places.city, places.zipcode, places.place_id AS pid, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', [id], one=True)
     reviews = query_db('''select * from reviews WHERE place_id=?''', id)
-    return render_template('place.html', place=theplace, reviews=reviews)
+    return render_template('place.html', pid=theplace['pid'] , place=theplace, reviews=reviews)
 
 
 @app.route('/place/<id>/comment/new', methods=['POST','GET'])
 def newcomment(id):
     """Add a new comment for the restaurant which has the id as parameter """
-    theplace = query_db('''select * from places WHERE place_id=?''', id)[0]
-    error = None
-
 
     if g.is_logged == False:
         flash ("You need to be logged in")
         return redirect(url_for('show_place', id=id))
 
     if request.method == 'POST':
-        try:
-            rating = int (request.form['rating'])
-        except ValueError:
-            rating = -10
+        rating = request.form['rating']
 
-        if rating < 0 or rating > 5:
-            error = "Rating (" + str(rating) + ") must be between 0 and 5 (inclusive)"
-            flash (error)
+        if rating.isdigit() == False:
+            flash ("Rating must be between a number between 0 and 5 (inclusive)")
+        elif int(rating) < 0 or int(rating) > 5:
+            flash ("Rating must be between 0 and 5 (inclusive)")
         else:
             db = get_db()
-            db.execute('''insert into reviews (rating, title, message, user_id, place_id) values (?, ?, ?,?,?)''', [request.form['rating'], request.form['title'], request.form['content'], g.user_id, id])
+            db.execute('''insert into reviews (rating, title, message, user_id, place_id) values (?, ?, ?,?,?)''', [rating, request.form['title'], request.form['content'], g.user_id, id])
             db.commit()
 
             flash('Your comment was successfully added')
