@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>My Reviews</h2>
+  <ul>
+  {% for review in reviews %}
+    <li>
+      <strong>{{review.title}} - <a href="{{ url_for('show_place', id=review.place_id)}}">{{ review.name }}</a> -<a href="{{ url_for('comment_delete', id=review.place_id, cid=review.review_id)}}">delete</a>
+    </li>
+  {% else %}
+    <li><em>You have no review now ... go post one!</em></li>
+  {% endfor %}
+  </ul>
+
+{% endblock %}

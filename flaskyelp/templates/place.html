@@ -1,0 +1,38 @@
+
+
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>{{ place.name }}</h2>
+  <ul>
+      <li><strong>Address</strong>: {{ place.name }}</li>
+      <li><strong>Zipcode</strong>: {{ place.zipcode }}</li>
+      <li><strong>City</strong>: {{ place.city }}</li>
+  </ul>
+
+
+  <h2>Reviews</h2>
+  <ul>
+  {% for review in reviews %}
+    <li>
+      <strong>{{ review.title }}</strong> ({{ review.rating }}) - {{ review.message }} - <a href="{{ url_for('comment_delete', id=place.place_id, cid=review.review_id)}}">delete</a>
+    </li>
+  {% else %}
+    <li><em>There's no review now</em></li>
+  {% endfor %}
+  </ul>
+
+  <h2>Add Review</h2>
+  <form action="{{ url_for('newcomment', id=place.place_id)}}" method="post">
+    <dl>
+      <dt>Title:
+      <dd><input type="text" name="title" size="30" value="{{ request.form.title }}">
+      <dt>Content:
+      <dd><input type="text" name="content"  value="{{ request.form.content }}">
+      <dt>Rating:
+      <dd><input type="text" name="rating" size="2" value="{{ request.form.rating}}">
+
+    </dl>
+    <div class="actions"><input type="submit" value="Send"></div>
+  </form>
+{% endblock %}

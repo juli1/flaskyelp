@@ -1,0 +1,30 @@
+<!doctype html>
+<title>{% block title %}Flaskyelp{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+<div class="page">
+  <h1><a href="/">FlaskYelp</a></h1>
+  <div class="navigation">
+  {% if g.is_logged %}
+    <a href="{{ url_for('account') }}">my reviews</a> |
+    <a href="{{ url_for('place_new') }}">add a place | </a>
+    <a href="{{ url_for('logout') }}">sign out [{{ g.username }}]</a>
+  {% else %}
+    <a href="{{ url_for('register') }}">register</a> |
+    <a href="{{ url_for('login') }}">sign in</a>
+  {% endif %}
+  </div>
+  {% with flashes = get_flashed_messages() %}
+    {% if flashes %}
+      <ul class="flashes">
+      {% for message in flashes %}
+        <li>{{ message }}
+      {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+  <div class="body">
+  {% block body %}{% endblock %}
+  </div>
+  <div class="footer">
+  </div>
+</div>

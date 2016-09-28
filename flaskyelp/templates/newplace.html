@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}Add a restaurant{% endblock %}
+{% block body %}
+  <h2>Add restaurant</h2>
+  {% if error %}<div class="error"><strong>Error:</strong> {{ error }}</div>{% endif %}
+  <form action="" method="post">
+    <dl>
+      <dt>Name:
+      <dd><input type="text" name="name" size="30" value="{{ request.form.name }}">
+      <dt>Address:
+      <dd><input type="text" name="address" size="30" value="{{ request.form.address }}">
+
+      <dt>City:
+      <dd><input type="text" name="city" size="30" value="{{ request.form.city }}">
+
+      <dt>Zipcode:
+      <dd><input type="text" name="zipcode" size="6" value="{{ request.form.zipcode }}">
+
+    </dl>
+    <div class="actions"><input type="submit" value="Add"></div>
+  </form>
+{% endblock %}

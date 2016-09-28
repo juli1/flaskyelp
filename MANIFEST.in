@@ -1,0 +1,2 @@
+graft flaskyelp/templates
+include flaskyelp/dbschema.sql

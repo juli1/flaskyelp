@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>Last Reviews</h2>
+  <ul>
+  {% for review in reviews %}
+    <li>
+      <strong>{{review.title}} - <a href="{{ url_for('show_place', id=review.place_id)}}">{{ review.name }}</a>
+    </li>
+  {% else %}
+    <li><em>There's no review for now ... come back later</em></li>
+  {% endfor %}
+  </ul>
+
+  <h2>Last Restaurants</h2>
+  <ul>
+  {% for place in places %}
+    <li>
+      <strong><a href="{{ url_for('show_place', id=place.place_id)
+      }}">{{ place.name }}</a></strong>
+    </li>
+  {% else %}
+    <li><em>There's no place</em></li>
+  {% endfor %}
+  </ul>
+{% endblock %}
