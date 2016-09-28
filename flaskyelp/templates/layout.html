@@ -6,13 +6,14 @@
   <div class="navigation">
   {% if g.is_logged %}
     <a href="{{ url_for('account') }}">my reviews</a> |
-    <a href="{{ url_for('place_new') }}">add a place | </a>
+    <a href="{{ url_for('place_new') }}">add a place</a> |
     <a href="{{ url_for('logout') }}">sign out [{{ g.username }}]</a>
   {% else %}
     <a href="{{ url_for('register') }}">register</a> |
     <a href="{{ url_for('login') }}">sign in</a>
   {% endif %}
   </div>
+  {% if error %}<div class="error"><strong>Error:</strong> {{ error }}</div>{% endif %}
   {% with flashes = get_flashed_messages() %}
     {% if flashes %}
       <ul class="flashes">

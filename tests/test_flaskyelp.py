@@ -58,5 +58,35 @@ class FlaskYelpTestCase(unittest.TestCase):
         assert b'very good place' in rv.data
         assert (b'no place' in rv.data) == False
 
+    def test_post_review (self):
+        "Try to test that a valid review"
+        self.register ("julien", "test","toto@toto.fr")
+        self.login ("julien", "test")
+        self.app.post('/place/new', data=dict(name="very good place", address="downtown place", city="pittsburgh", zipcode="15101"), follow_redirects=True)
+        self.app.post('/place/1/comment/new', data=dict(title="mytitle1", content="amazing place", rating="2"), follow_redirects=True)
+        rv = self.app.get('/')
+        assert b'very good place' in rv.data
+        assert b'mytitle1' in rv.data
+
+    def test_post_invalid_review (self):
+        "Test that a invalid review with a score higher than 5 is not posted"
+        self.register ("julien", "test","toto@toto.fr")
+        self.login ("julien", "test")
+        self.app.post('/place/new', data=dict(name="very good place", address="downtown place", city="pittsburgh", zipcode="15101"), follow_redirects=True)
+        self.app.post('/place/1/comment/new', data=dict(title="mytitle1", content="amazing place", rating="10"), follow_redirects=True)
+        rv = self.app.get('/')
+        assert b'very good place' in rv.data
+        assert (b'mytitle1' in rv.data) == False
+
+    def test_rating_average (self):
+        "Test the average of review"
+        self.register ("julien", "test","toto@toto.fr")
+        self.login ("julien", "test")
+        self.app.post('/place/new', data=dict(name="very good place", address="downtown place", city="pittsburgh", zipcode="15101"), follow_redirects=True)
+        self.app.post('/place/1/comment/new', data=dict(title="mytitle1", content="amazing place", rating="10"), follow_redirects=True)
+        rv = self.app.get('/place/1')
+        assert b'(3.0)' in rv.data
+
+
 if __name__ == '__main__':
     unittest.main()

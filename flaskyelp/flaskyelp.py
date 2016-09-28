@@ -87,6 +87,7 @@ def initdb_command():
 @app.route('/')
 @app.route('/index')
 def index():
+    """main page, display the last reviews and places"""
     last_places=query_db('''select * from places ORDER BY place_id DESC LIMIT 10''')
     last_reviews=query_db('''select places.name, places.place_id, review_id, title FROM reviews, places WHERE places.place_id=reviews.place_id ORDER BY review_id DESC LIMIT 10''')
     return render_template('main.html', places=last_places, reviews=last_reviews)
@@ -96,7 +97,7 @@ def index():
 @app.route('/place/<id>')
 def show_place(id):
     """Show the restaurant which has the id as parameter """
-    theplace = query_db('''select * from places WHERE place_id=?''', id)[0]
+    theplace = query_db('''select *, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', id)[0]
     reviews = query_db('''select * from reviews WHERE place_id=?''', id)
     return render_template('place.html', place=theplace, reviews=reviews)
 
@@ -113,11 +114,20 @@ def newcomment(id):
         return redirect(url_for('show_place', id=id))
 
     if request.method == 'POST':
-        db = get_db()
-        db.execute('''insert into reviews (rating, title, message, user_id, place_id) values (?, ?, ?,?,?)''', [request.form['rating'], request.form['title'], request.form['content'], g.user_id, id])
-        db.commit()
+        try:
+            rating = int (request.form['rating'])
+        except ValueError:
+            rating = -10
 
-        flash('The restaurant is succesfully added')
+        if rating < 0 or rating > 5:
+            error = "Rating (" + str(rating) + ") must be between 0 and 5 (inclusive)"
+            flash (error)
+        else:
+            db = get_db()
+            db.execute('''insert into reviews (rating, title, message, user_id, place_id) values (?, ?, ?,?,?)''', [request.form['rating'], request.form['title'], request.form['content'], g.user_id, id])
+            db.commit()
+
+            flash('Your comment was successfully added')
     return redirect(url_for('show_place', id=id))
 
 
@@ -157,7 +167,7 @@ def place_new():
         db.execute('''insert into places (name, address, city, zipcode) values (?, ?, ?, ?)''', [request.form['name'], request.form['address'], request.form['city'], request.form['zipcode']])
         db.commit()
 
-        flash('The restaurant is succesfully added')
+        flash('The restaurant was succesfully added')
         return redirect(url_for('index'))
     else:
 
