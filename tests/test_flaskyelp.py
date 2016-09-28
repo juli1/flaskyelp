@@ -1,3 +1,9 @@
+"""
+Test for flaskyelp
+
+:copyright: (c) Julien Delange
+"""
+
 import os
 import unittest
 import tempfile

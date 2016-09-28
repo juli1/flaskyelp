@@ -4,7 +4,8 @@
 """
 flaskyelp
 
-A simple yelp application using flask
+A simple yelp application using flask.
+More information: http://github.com/juli1/flaskyelp
 
 :copyright: (c) Julien Delange
 """
@@ -97,7 +98,9 @@ def index():
 
 @app.route('/place/<id>')
 def show_place(id):
-    """Show the restaurant which has the id as parameter """
+
+    """Show the place which has the id as parameter """
+
     theplace = query_db('''select places.name, places.address, places.city, places.zipcode, places.place_id AS pid, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', [id], one=True)
     reviews = query_db('''select * from reviews WHERE place_id=?''', id)
     return render_template('place.html', pid=theplace['pid'] , place=theplace, reviews=reviews)
@@ -146,14 +149,14 @@ def comment_delete(id,cid):
 
 @app.route('/account')
 def account():
+    """View account with all reviews"""
     my_reviews=query_db('''select places.name, places.place_id, review_id, title FROM reviews, places WHERE places.place_id=reviews.place_id AND reviews.user_id=? ORDER BY review_id''', [g.user_id])
     return render_template('account.html', reviews=my_reviews)
 
 
 @app.route('/place/new', methods=['GET', 'POST'])
 def place_new():
-    error = None
-
+    """Add a new place in the database"""
     if g.is_logged == False:
         flash ("You need to be logged in")
         return redirect(url_for('index'))
@@ -171,6 +174,7 @@ def place_new():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    """Register a new user"""
     error = None
     if request.method == 'POST':
         if not request.form['username']:
@@ -199,6 +203,7 @@ def register():
 
 @app.route('/logout')
 def logout():
+    """Logout and remove the active session"""
     session.pop('username', None)
     session.pop('user_id', None)
     flash ("You are logged out")
@@ -206,6 +211,7 @@ def logout():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    """Login and fill the user session"""
     error = None
     if request.method == 'POST':
         user = query_db('''select * from users where
