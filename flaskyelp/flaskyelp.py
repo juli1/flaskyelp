@@ -101,9 +101,15 @@ def show_place(id):
 
     """Show the place which has the id as parameter """
 
-    theplace = query_db('''select places.name, places.address, places.city, places.zipcode, places.place_id AS pid, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', [id], one=True)
-    reviews = query_db('''select * from reviews WHERE place_id=?''', id)
-    return render_template('place.html', pid=theplace['pid'] , place=theplace, reviews=reviews)
+    # theplace = query_db('''select places.name, places.address, places.city, places.zipcode, places.place_id AS pid, AVG(rating) AS avgrating from places, reviews WHERE places.place_id=? AND reviews.place_id=places.place_id''', [id], one=True)
+    theplace = query_db('''select name, address, city, zipcode, place_id from places WHERE place_id=?''', [id], one=True)
+    reviews = query_db('''select * from reviews WHERE place_id=?''', [id])
+    avg = query_db('''select AVG(rating) from reviews WHERE place_id=?''', [id], one=True)[0]
+    if avg is None:
+        avg = 0
+    print theplace
+
+    return render_template('place.html', place=theplace, reviews=reviews, rating=avg)
 
 
 @app.route('/place/<id>/comment/new', methods=['POST','GET'])
